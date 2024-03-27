@@ -1,7 +1,7 @@
 import scala.reflect.ClassTag
 
-private case class UnlimitedPriorityQueue[A](elements: List[(A, Int)]) extends PriorityQueue[A] with CommonMethods {
-  override def enqueue[B >: A](elem: B, priority: Int): PriorityQueue[B] = {
+private case class UnlimitedPriorityQueue[A](elements: List[(A, Int)]) extends PriorityQueue[A] {
+  override def enqueue(elem: A, priority: Int): PriorityQueue[A] = {
     val newElements = elements :+ (elem, priority)
     UnlimitedPriorityQueue(newElements)
   }
@@ -13,11 +13,15 @@ private case class UnlimitedPriorityQueue[A](elements: List[(A, Int)]) extends P
     (elem, UnlimitedPriorityQueue(newElems))
   }
 
-  override def iterator: Iterator[A] = {
-    sortForIterator(elements).map(_._1).iterator
+  override def iterator: Iterator[A] = new Iterator[A] {
+    private val iter = elements.iterator
+
+    override def hasNext: Boolean = iter.hasNext
+
+    override def next(): A = iter.next()._1
   }
 
-  override def toList: List[A] = if (elements.isEmpty) List.empty else elements.map(_._1)
+  override def toList: List[A] = elements.map(_._1)
 
-  override def toArray(implicit ev: ClassTag[A]): Array[Any] = toArrayHelper(elements)
+  override def toArray(implicit ev: ClassTag[A]): Array[Any] = elements.map(_._1).toArray
 }

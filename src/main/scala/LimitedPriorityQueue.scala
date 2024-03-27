@@ -1,28 +1,34 @@
 import scala.reflect.ClassTag
 
-private case class LimitedPriorityQueue[A](capacity: Int, elements: List[(A, Int)]) extends PriorityQueue[A] with CommonMethods {
-  override def enqueue[B >: A](elems: B, priority: Int): PriorityQueue[B] = {
+private case class LimitedPriorityQueue[A](capacity: Int, elements: List[(A, Int)]) extends PriorityQueue[A] {
+  override def enqueue(elems: A, priority: Int): PriorityQueue[A] = {
     if (elements.length < capacity) {
       val newElements = elements :+ (elems, priority)
       LimitedPriorityQueue(capacity, newElements)
     } else {
-      this.asInstanceOf[PriorityQueue[B]]
+      this.asInstanceOf[PriorityQueue[A]]
     }
   }
 
   override def peek: Option[A] = elements.maxByOption(t => (t._2, -elements.indexWhere(_ == t))).map(_._1)
 
-  override def dequeue: Option[(A, PriorityQueue[A])] = peek.map { elem =>
-    val newElements = elements.filter(_ != (elem, elements.maxBy(_._2)._2))
-    val newQueue = LimitedPriorityQueue(capacity, newElements)
-    (elem, newQueue)
+  override def dequeue: Option[(A, PriorityQueue[A])] = getHighPriorityEl.map { elem =>
+    val newEls = elements.filterNot(_ == elem)
+    val newQueue = LimitedPriorityQueue(capacity, newEls)
+    (elem._1, newQueue)
   }
 
-  override def iterator: Iterator[A] = {
-    sortForIterator(elements).map(_._1).iterator
+  private def getHighPriorityEl: Option[(A, Int)] = elements.maxByOption(_._2)
+
+  override def iterator: Iterator[A] = new Iterator[A] {
+    private val iter = elements.iterator
+
+    override def hasNext: Boolean = iter.hasNext
+
+    override def next(): A = iter.next()._1
   }
 
-  override def toList: List[A] = if (elements.isEmpty) List.empty else elements.map(_._1)
+  override def toList: List[A] = elements.map(_._1)
 
-  override def toArray(implicit ev: ClassTag[A]): Array[Any] = toArrayHelper(elements)
+  override def toArray(implicit ev: ClassTag[A]): Array[Any] = elements.map(_._1).toArray
 }

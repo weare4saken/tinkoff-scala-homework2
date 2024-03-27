@@ -1,7 +1,7 @@
 import scala.reflect.ClassTag
 
 trait PriorityQueue[A] extends Iterable[A] {
-  def enqueue[B >: A](elem: B, priority: Int): PriorityQueue[B]
+  def enqueue(elem: A, priority: Int): PriorityQueue[A]
 
   //в данной реализации peek == headOption у List'a
   def peek: Option[A]
@@ -26,15 +26,12 @@ trait PriorityQueue[A] extends Iterable[A] {
 }
 
 object PriorityQueue {
-  def unlimitedQueue[A]: PriorityQueue[A] = UnlimitedPriorityQueue(Nil)
-
-  def limitedQueue[A](capacity: Int): PriorityQueue[A] = LimitedPriorityQueue(capacity, Nil)
-
   def apply[A](elems: (A, Int)*): PriorityQueue[A] = {
     var priorityQueue: PriorityQueue[A] = UnlimitedPriorityQueue(Nil)
-    for ((elem, priority) <- elems) {
-      priorityQueue = priorityQueue.enqueue(elem, priority)
+    val filledQueue = elems.foldLeft(UnlimitedPriorityQueue[A](Nil): PriorityQueue[A]) {
+      case (acc, (el, prior)) => acc.enqueue(el, prior)
     }
-    priorityQueue
+
+    filledQueue
   }
 }

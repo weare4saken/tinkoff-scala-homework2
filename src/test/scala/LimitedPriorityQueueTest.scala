@@ -2,13 +2,14 @@ import munit.FunSuite
 
 class LimitedPriorityQueueTest extends FunSuite {
   test("enqueue") {
-    var pq = PriorityQueue.limitedQueue[String](1)
+    var pq: PriorityQueue[String] = LimitedPriorityQueue(1, Nil)
     pq = pq.enqueue("abc", 1)
+
     assertEquals(pq.peek, Some("abc"))
   }
 
   test("peek") {
-    var pq = PriorityQueue.limitedQueue[Int](7)
+    var pq: PriorityQueue[Int] = LimitedPriorityQueue(7, Nil)
     pq = pq.enqueue(1, 1)
       .enqueue(2, 3)
       .enqueue(3, 2)
@@ -16,40 +17,45 @@ class LimitedPriorityQueueTest extends FunSuite {
       .enqueue(5, 6)
       .enqueue(6, 5)
       .enqueue(7, 7)
+
     assertEquals(pq.peek, Some(4))
   }
 
   test("dequeue") {
-    var pq = PriorityQueue.limitedQueue[Int](5)
+    var pq: PriorityQueue[Int] = LimitedPriorityQueue(5, Nil)
     pq = pq.enqueue(1, 3)
       .enqueue(2, 1)
       .enqueue(3, 2)
       .enqueue(4, 3)
       .enqueue(5, 1)
+
     val (elem, pq2) = pq.dequeue.get
+
     assertEquals(elem, 1)
     assertEquals(pq2.peek, Some(4))
   }
 
-  test("iterator") {
-    var pq = PriorityQueue.limitedQueue[Char](7)
-    pq = pq.enqueue('b', 6)
-      .enqueue('d', 3)
-      .enqueue('o', 2)
-      .enqueue('a', 7)
-      .enqueue('n', 1)
-      .enqueue('n', 4)
-      .enqueue('a', 5)
+  test("iterator is empty") {
+    val pq: PriorityQueue[Int] = LimitedPriorityQueue(5, Nil)
 
-    val iterator = pq.iterator
-    val expectedElements = List('a', 'b', 'a', 'n', 'd', 'o', 'n')
-    val actualElements = iterator.toList
+    assertEquals(pq.iterator.hasNext, false)
+  }
 
-    assertEquals(actualElements, expectedElements)
+  test("iterator is not empty") {
+    val pq: PriorityQueue[Int] = LimitedPriorityQueue(3, List((1, 1), (2, 2), (3, 3)))
+    val it = pq.iterator
+
+    assertEquals(it.hasNext, true)
+    assertEquals(it.next(), 1)
+    assertEquals(it.hasNext, true)
+    assertEquals(it.next(), 2)
+    assertEquals(it.hasNext, true)
+    assertEquals(it.next(), 3)
+    assertEquals(it.hasNext, false)
   }
 
   test("toList") {
-    var pq = PriorityQueue.limitedQueue[Int](7)
+    var pq: PriorityQueue[Int] = LimitedPriorityQueue(7, Nil)
     pq = pq.enqueue(1, 1)
       .enqueue(2, 3)
       .enqueue(3, 2)
@@ -65,7 +71,7 @@ class LimitedPriorityQueueTest extends FunSuite {
   }
 
   test("toArray") {
-    var pq = PriorityQueue.limitedQueue[Int](7)
+    var pq: PriorityQueue[Int] = LimitedPriorityQueue(7, Nil)
     pq = pq.enqueue(1, 1)
       .enqueue(2, 3)
       .enqueue(3, 2)
@@ -81,12 +87,13 @@ class LimitedPriorityQueueTest extends FunSuite {
   }
 
   test("isEmpty") {
-    val pq = PriorityQueue.limitedQueue[Int](0)
+    val pq: PriorityQueue[Int] = LimitedPriorityQueue(0, Nil)
+
     assertEquals(pq.isEmpty, true)
   }
 
   test("size") {
-    var pq = PriorityQueue.limitedQueue[Int](3)
+    var pq: PriorityQueue[Int] = LimitedPriorityQueue(3, Nil)
     pq = pq.enqueue(1, 3)
       .enqueue(2, 1)
       .enqueue(3, 2)
@@ -95,7 +102,7 @@ class LimitedPriorityQueueTest extends FunSuite {
   }
 
   test("head") {
-    var pq = PriorityQueue.limitedQueue[Int](3)
+    var pq: PriorityQueue[Int] = LimitedPriorityQueue(3, Nil)
     pq = pq.enqueue(1, 3)
       .enqueue(2, 1)
       .enqueue(3, 2)
@@ -104,7 +111,7 @@ class LimitedPriorityQueueTest extends FunSuite {
   }
 
   test("tail") {
-    var pq = PriorityQueue.limitedQueue[Int](3)
+    var pq: PriorityQueue[Int] = LimitedPriorityQueue(3, Nil)
     pq = pq.enqueue(1, 3)
       .enqueue(2, 1)
       .enqueue(3, 2)
@@ -113,7 +120,7 @@ class LimitedPriorityQueueTest extends FunSuite {
   }
 
   test("tail with exception") {
-    var pq = PriorityQueue.limitedQueue[Int](6)
+    var pq: PriorityQueue[Int] = LimitedPriorityQueue(6, Nil)
 
     intercept[NoSuchElementException] {
       pq.tail
