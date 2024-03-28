@@ -64,7 +64,7 @@ class LimitedPriorityQueueTest extends FunSuite {
       .enqueue(6, 5)
       .enqueue(7, 7)
 
-    val expectedList = List(1, 2, 3, 4, 5, 6, 7)
+    val expectedList = List(7, 6, 5, 4, 3, 2, 1)
     val actualList = pq.toList
 
     assertEquals(actualList, expectedList)
@@ -80,7 +80,7 @@ class LimitedPriorityQueueTest extends FunSuite {
       .enqueue(6, 5)
       .enqueue(7, 7)
 
-    val expectedArray = Array(1, 2, 3, 4, 5, 6, 7)
+    val expectedArray = Array(7, 6, 5, 4, 3, 2, 1)
     val actualArray = pq.toArray
 
     assertEquals(actualArray.toList, expectedArray.toList)
@@ -107,16 +107,17 @@ class LimitedPriorityQueueTest extends FunSuite {
       .enqueue(2, 1)
       .enqueue(3, 2)
 
-    assertEquals(pq.head, 1)
+    assertEquals(pq.head, 3)
   }
 
   test("tail") {
-    var pq: PriorityQueue[Int] = LimitedPriorityQueue(3, Nil)
+    var pq: PriorityQueue[Int] = LimitedPriorityQueue(4, Nil)
     pq = pq.enqueue(1, 3)
       .enqueue(2, 1)
       .enqueue(3, 2)
+      .enqueue(4, 1)
 
-    assertEquals(pq.tail, List(3, 2))
+    assertEquals(pq.tail, List(1, 2, 3))
   }
 
   test("tail with exception") {

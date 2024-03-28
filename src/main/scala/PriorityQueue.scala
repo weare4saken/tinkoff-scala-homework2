@@ -24,14 +24,3 @@ trait PriorityQueue[A] extends Iterable[A] {
   override def tail: List[A] = if (isEmpty) throw new NoSuchElementException("tail of empty list") else toList.tail.reverse
   //так же можно переопределить и другие методы Iterable
 }
-
-object PriorityQueue {
-  def apply[A](elems: (A, Int)*): PriorityQueue[A] = {
-    var priorityQueue: PriorityQueue[A] = UnlimitedPriorityQueue(Nil)
-    val filledQueue = elems.foldLeft(UnlimitedPriorityQueue[A](Nil): PriorityQueue[A]) {
-      case (acc, (el, prior)) => acc.enqueue(el, prior)
-    }
-
-    filledQueue
-  }
-}

@@ -1,24 +1,22 @@
 import scala.reflect.ClassTag
 
 private case class LimitedPriorityQueue[A](capacity: Int, elements: List[(A, Int)]) extends PriorityQueue[A] {
-  override def enqueue(elems: A, priority: Int): PriorityQueue[A] = {
+  override def enqueue(elem: A, priority: Int): PriorityQueue[A] = {
     if (elements.length < capacity) {
-      val newElements = elements :+ (elems, priority)
+      val newElements = (elem, priority) :: elements
       LimitedPriorityQueue(capacity, newElements)
     } else {
       this.asInstanceOf[PriorityQueue[A]]
     }
   }
 
-  override def peek: Option[A] = elements.maxByOption(t => (t._2, -elements.indexWhere(_ == t))).map(_._1)
+  override def peek: Option[A] = elements.findLast { case (_, priority) => priority == elements.maxBy(_._2)._2 }.map(_._1)
 
-  override def dequeue: Option[(A, PriorityQueue[A])] = getHighPriorityEl.map { elem =>
-    val newEls = elements.filterNot(_ == elem)
-    val newQueue = LimitedPriorityQueue(capacity, newEls)
-    (elem._1, newQueue)
+  override def dequeue: Option[(A, PriorityQueue[A])] = peek.map { elem =>
+    val newElems = elements.filter(_ != (elem, elements.maxBy(_._2)._2))
+    val newQueue = LimitedPriorityQueue(capacity, newElems)
+    (elem, newQueue)
   }
-
-  private def getHighPriorityEl: Option[(A, Int)] = elements.maxByOption(_._2)
 
   override def iterator: Iterator[A] = new Iterator[A] {
     private val iter = elements.iterator
